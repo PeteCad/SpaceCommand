@@ -31,8 +31,8 @@ BG = pygame.transform.scale(BG, WXH)
 
 # Define movable objects
 class Ship:
-    def __init__(self, (x,y), health=100):
-        self.pos = (x,y)
+    def __init__(self, x, y, health=100):
+        self.x, self.y = x,y
         self.health = health
         self.ship_img = None
         self.laser_img = None
@@ -40,6 +40,9 @@ class Ship:
         self.cool_down_counter = 0
     def draw(self):
         self.x += 1
+    def set_ship(ship_img, laser_img):
+        self.ship_img = ship_img
+        self.laser_img = laser_img
 
 
 # Set up fonts
