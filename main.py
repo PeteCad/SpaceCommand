@@ -3,10 +3,10 @@ import pygame
 import os
 import time
 import random
-
+pygame.font.init()  #Initialize fonts
 
 # Initalize Pygame surface for drawing(size only)
-WXH = (750, 750)
+WXH = (750, 750) #Width x Height
 WINDOW = pygame.display.set_mode(WXH)
 pygame.display.set_caption("Space Command")
 
@@ -25,9 +25,19 @@ GREEN_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_green.png"))
 BLUE_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_blue.png"))
 YELLOW_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_yellow.png"))
 
-# Background Image
+# Background Image and fit window
 BG = pygame.image.load(os.path.join("assets", "background-black.png"))
 BG = pygame.transform.scale(BG, WXH)
+
+
+
+# Set up fonts
+# font colour and attributes
+ANTIALIAS = True
+WHITE=(255,255,255)
+FONT_SIZE = 50
+# Create main font
+main_font = pygame.font.SysFont("comicsans", FONT_SIZE)
 
 def main():
 
@@ -36,11 +46,21 @@ def main():
     FPS = 60 #Frames per second
     clock = pygame.time.Clock()
 
+    # Game Play Variables
+    level = 1
+    lives = 5
+
     def redraw_window():
 
         #Cover previous screen
-        WINDOW.blit
         WINDOW.blit(BG, (0,0))
+
+        # Print user info
+        level_label=main_font.render(f"Level: {level}", ANTIALIAS, WHITE)
+        lives_label=main_font.render(f"Lives: {lives}", ANTIALIAS, WHITE)
+
+        WINDOW.blit(level_label, (10,10))
+        WINDOW.blit(lives_label,(BG.get_width()-10-lives_label.get_width(),10))
 
         #Update Surface
         pygame.display.update()
