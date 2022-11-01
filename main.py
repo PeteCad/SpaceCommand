@@ -1,8 +1,12 @@
+<<<<<<< HEAD
 from operator import truediv
+=======
+>>>>>>> ddc44d10ba0a77492e5515637d98b55575eff07b
 import pygame
 import os
 import time
 import random
+<<<<<<< HEAD
 pygame.font.init()  #Initialize fonts
 
 # Initalize Pygame surface for drawing(size only)
@@ -12,6 +16,11 @@ pygame.display.set_caption("Space Command")
 
 # Load image assets
 # Enemy ships
+=======
+
+# Load image assets
+#enemy ships
+>>>>>>> ddc44d10ba0a77492e5515637d98b55575eff07b
 RED_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_red_small.png"))
 GREEN_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_green_small.png"))
 BLUE_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_blue_small.png"))
@@ -23,6 +32,7 @@ RED_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_yellow.png
 RED_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_red.png"))
 GREEN_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_green.png"))
 BLUE_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_blue.png"))
+<<<<<<< HEAD
 YELLOW_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_yellow.png"))
 
 # Background Image and fit window
@@ -84,3 +94,10 @@ def main():
 
 
 main()
+=======
+YELLOW_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_yellowpng"))
+
+# Background Image
+BG = pygame.image.load(os.path.join("assets", "background-black.png"))
+
+>>>>>>> ddc44d10ba0a77492e5515637d98b55575eff07b
