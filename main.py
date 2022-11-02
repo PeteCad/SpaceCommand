@@ -6,7 +6,9 @@ import random
 pygame.font.init()  #Initialize fonts
 
 # Initalize Pygame surface for drawing(size only)
-WXH = (750, 750) #Width x Height
+WIDTH = 750
+HEIGHT = 750
+WXH = [WIDTH, HEIGHT] #Width x Height
 WINDOW = pygame.display.set_mode(WXH)
 pygame.display.set_caption("Space Command")
 
