@@ -40,7 +40,7 @@ class Ship:
         self.cool_down_counter = 0
     def draw(self):
         self.x += 1
-    def set_ship(ship_img, laser_img):
+    def set_ship(self,ship_img, laser_img):
         self.ship_img = ship_img
         self.laser_img = laser_img
 
