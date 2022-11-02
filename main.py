@@ -53,10 +53,10 @@ class Ship:
         self.cool_down_counter = 0
     def draw(self, window):
         pygame.draw.rect(window, RED, (self.x,self.y,50,50))
-    def move(self, x, y)
+    def move(self, x, y):
         self.x += x
         self.y += y
-    def position(self, x, y)
+    def position(self, x, y):
         self.x = x
         self.y = y
     def set_ship(ship_img, laser_img):
