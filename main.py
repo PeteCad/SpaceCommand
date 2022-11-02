@@ -51,15 +51,19 @@ class Ship:
         self.laser_img = None
         self.lasers = []
         self.cool_down_counter = 0
-    def draw(self, window):
+        
+    def draw(self, window): #draw the ship on specified surface
         pygame.draw.rect(window, RED, (self.x,self.y,50,50))
-    def move(self, x, y)
+        
+    def move(self, x, y):  #move the ship relative to current position +/- x,y
         self.x += x
         self.y += y
-    def position(self, x, y)
+        
+    def position(self, x, y): #set the current position of the ship
         self.x = x
         self.y = y
-    def set_ship(ship_img, laser_img):
+
+    def set_ship_img(ship_img, laser_img): #load graphics for the ship
         self.ship_img = ship_img
         self.laser_img = laser_img
 
