@@ -35,7 +35,6 @@ BG = pygame.transform.scale(BG, WXH)
 WHITE = (255,255,255)
 RED = (255,0,0)
 
-
 # Set up fonts
 # font colour and attributes
 ANTIALIAS = True
