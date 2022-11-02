@@ -29,6 +29,19 @@ YELLOW_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_yellow.png"
 BG = pygame.image.load(os.path.join("assets", "background-black.png"))
 BG = pygame.transform.scale(BG, WXH)
 
+#colour constants
+WHITE = (255,255,255)
+RED = (255,0,0)
+
+
+# Set up fonts
+# font colour and attributes
+ANTIALIAS = True
+FONT_SIZE = 50
+# Create main font
+main_font = pygame.font.SysFont("comicsans", FONT_SIZE)
+
+
 # Define movable objects
 class Ship:
     def __init__(self, x, y, health=100):
@@ -38,20 +51,18 @@ class Ship:
         self.laser_img = None
         self.lasers = []
         self.cool_down_counter = 0
-    def draw(self):
-        self.x += 1
-    def set_ship(self,ship_img, laser_img):
+    def draw(self, window):
+        pygame.draw.rect(window, RED, (self.x,self.y,50,50))
+    def move(self, x, y)
+        self.x += x
+        self.y += y
+    def position(self, x, y)
+        self.x = x
+        self.y = y
+    def set_ship(ship_img, laser_img):
         self.ship_img = ship_img
         self.laser_img = laser_img
 
-
-# Set up fonts
-# font colour and attributes
-ANTIALIAS = True
-WHITE=(255,255,255)
-FONT_SIZE = 50
-# Create main font
-main_font = pygame.font.SysFont("comicsans", FONT_SIZE)
 
 def main():
 
@@ -63,7 +74,9 @@ def main():
     # Game Play Variables
     level = 1
     lives = 5
-
+    
+    # Create ship object
+    ship = Ship(300, 600)
     def redraw_window():
 
         #Cover previous screen
@@ -75,6 +88,7 @@ def main():
 
         WINDOW.blit(level_label, (10,10))
         WINDOW.blit(lives_label,(BG.get_width()-10-lives_label.get_width(),10))
+        ship.draw(WINDOW)
 
         #Update Surface
         pygame.display.update()
