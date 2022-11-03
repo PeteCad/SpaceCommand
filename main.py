@@ -8,7 +8,7 @@ pygame.font.init()  #Initialize fonts
 # Initalize Pygame surface for drawing(size only)
 WIDTH = 750
 HEIGHT = 750
-WXH = [WIDTH, HEIGHT] #Width x Height
+WXH = [WIDTH * 2, HEIGHT] #Width x Height
 WINDOW = pygame.display.set_mode(WXH)
 pygame.display.set_caption("Space Command")
 
