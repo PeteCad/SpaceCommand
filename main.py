@@ -8,7 +8,7 @@ pygame.font.init()  #Initialize fonts
 # Initalize Pygame surface for drawing(size only)
 WIDTH = 750
 HEIGHT = 750
-WXH = [WIDTH * 2, HEIGHT] #Width x Height
+WXH = [WIDTH, HEIGHT] #Width x Height
 WINDOW = pygame.display.set_mode(WXH)
 pygame.display.set_caption("Space Command")
 
@@ -64,14 +64,15 @@ class Ship:
         self.x = x
         self.y = y
 
-    def set_ship_img(ship_img, laser_img): #load graphics for the ship
+    def set_ship_img(self, ship_img, laser_img): #load graphics for the ship
         self.ship_img = ship_img
         self.laser_img = laser_img
         
-    def shoot():
+    def shoot(self):  #shoot stuff
+        self.laser_img = self.laser_img
 
 def main():
-
+    Whatthe = 1    
     # Collision checking setup
     run = True
     FPS = 60 #Frames per second
@@ -115,15 +116,17 @@ def main():
             #Check for QUIT
             if event.type == pygame.QUIT:
                 run = False
-            keys = pygame.keys.get_pressed()
-            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            	ship.move(velocity, 0)
-            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            	ship.move(-velocity, 0)
-            if keys[pygame.K_UP] or keys[pygame.K_w]:
-            	ship.move(0, -velocity)
-            if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            	ship.move(0, velocity)
+
+        # Check key presses and perform actions    
+        keys = pygame.keys.get_pressed()
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            ship.move(velocity, 0)
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            ship.move(-velocity, 0)
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            ship.move(0, -velocity)
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+           	ship.move(0, velocity)
 
 
 main()
