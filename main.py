@@ -73,6 +73,12 @@ class Ship:
     def shoot(self):  #shoot stuff
         self.laser_img = self.laser_img
 
+    def get_width(self):
+        return self.ship_img.get_width()
+    
+    def get_height(self):
+            return self.ship_img.get_height()
+
 class Player(Ship):
 
     def __init__(self, x, y, health=100):
@@ -84,8 +90,21 @@ class Player(Ship):
 
 class Enemy(Ship):
 
+    #dictionary for colours of ships
+    COLOR_MAP = {
+                "RED":(RED_SPACE_SHIP, RED_LASER),
+                "GREEN":(GREEN_SPACE_SHIP, GREEN_LASER),
+                "BLUE":(BLUE_SPACE_SHIP, BLUE_LASER)
+                }
+    
+    #init
     def __init__(self, x, y, colour, health=100):
         super().__init__(x,y,health)
+        self.ship_img, self.laser_img = self.COLOR_MAP[colour]  # Set ship images
+        self.mask = pygame.mask.from_surface(self.ship_img)
+
+    def move(self, vel):
+        self.y += vel
 
 def main():
     whatthe = 1
@@ -100,8 +119,16 @@ def main():
     velocity = 300
     player_velocity = velocity // FPS #adjust velocity for variable FPS
     
-    # Create ship object
+    enemies = [] #will hold enemies
+    enemy_velocity = 60 // FPS
+    wave_length = 5 #number of enemies per level
+
+    
+    # Create ship objects
     player_ship = Player(300, 600)
+    
+
+
     def redraw_window():
 
         #Cover previous screen
@@ -113,7 +140,15 @@ def main():
 
         WINDOW.blit(level_label, (10,10))
         WINDOW.blit(lives_label,(BG.get_width()-10-lives_label.get_width(),10))
+        
+        #draw all enemies
+        for enemy in enemies: 
+            enemy.draw(WINDOW)
+        
+        #draw player ship
         player_ship.draw(WINDOW)
+
+        
 
         #Update Surface
         pygame.display.update()
@@ -122,6 +157,12 @@ def main():
         
         #wait for tick
         clock.tick(FPS)
+
+        if len(enemies) == 0:
+            level += 1
+            wave_length += 5
+            for x in range(wave_length):
+                enemies.append(Enemy(random.randrange(50, WIDTH-50), random.randrange(-1500, -50), random.choice("RED", "BLUE", "GREEN")))
 
         #draw window
         redraw_window()
