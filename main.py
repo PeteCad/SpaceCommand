@@ -3,6 +3,7 @@ import pygame
 import os
 import time
 import random
+
 pygame.font.init()  #Initialize fonts
 
 # Initalize Pygame surface for drawing(size only)
@@ -39,11 +40,33 @@ RED = (255,0,0)
 # font colour and attributes
 ANTIALIAS = True
 FONT_SIZE = 50
-# Create main font
+# Create fonts
 main_font = pygame.font.SysFont("comicsans", FONT_SIZE)
+lost_font = pygame.font.SysFont("comicsans", FONT_SIZE+10)
 
 
 # Define movable objects
+#Define lasers
+class Laser:
+    def __init__(self, x, y, img):
+        self.x = x
+        self.y = y
+        self.img = img
+        self.mask = pygame.mask.from_surface(self.img)
+
+    def draw(self, window):
+        window.blit(self.img, (self.x, self.y))
+
+    def move(self, y):
+        self.y += y
+
+    def off_screen(self):
+        return self.y < 0 and self.y > HEIGHT
+    
+    def collision(self, obj):
+        return collide(self, obj)
+
+#Define ships
 class Ship:
     def __init__(self, x, y, health=100):
         self.x, self.y = x,y
@@ -69,9 +92,14 @@ class Ship:
     def set_ship_img(self, ship_img, laser_img): #load graphics for the ship
         self.ship_img = ship_img
         self.laser_img = laser_img
-        
+
+    # Shoot the laser    
     def shoot(self):  #shoot stuff
         self.laser_img = self.laser_img
+    
+    # Test is the ship is destoryed
+    def isDestroyed(self):
+        return self.health == 0
 
     def get_width(self):
         return self.ship_img.get_width()
@@ -107,21 +135,23 @@ class Enemy(Ship):
         self.y += vel
 
 def main():
-    whatthe = 1
+    
     # Collision checking setup
     run = True
     FPS = 60 #Frames per second
     clock = pygame.time.Clock()
 
     # Game Play Variables
-    level = 1
+    level = 0
     lives = 5
+    lost = False
+    lost_timer = 0
     velocity = 300
     player_velocity = velocity // FPS #adjust velocity for variable FPS
     
     enemies = [] #will hold enemies
-    enemy_velocity = 60 // FPS
-    wave_length = 5 #number of enemies per level
+    enemy_velocity = 120 // FPS
+    wave_length = 0 #number of enemies per level
 
     
     # Create ship objects
@@ -139,8 +169,13 @@ def main():
         lives_label=main_font.render(f"Lives: {lives}", ANTIALIAS, WHITE)
 
         WINDOW.blit(level_label, (10,10))
-        WINDOW.blit(lives_label,(BG.get_width()-10-lives_label.get_width(),10))
+        WINDOW.blit(lives_label,(WIDTH-10-lives_label.get_width(),10))
         
+        # Check for lost condition
+        if lost:
+            gameover_label=lost_font.render("GAME OVER MAN!", ANTIALIAS, WHITE)
+            WINDOW.blit(gameover_label, ((WIDTH-gameover_label.get_width())//2, HEIGHT//2 + gameover_label.get_height()//2))
+
         #draw all enemies
         for enemy in enemies: 
             enemy.draw(WINDOW)
@@ -148,12 +183,23 @@ def main():
         #draw player ship
         player_ship.draw(WINDOW)
 
-        
-
         #Update Surface
         pygame.display.update()
 
     while run:
+
+        #draw window
+        redraw_window()
+
+        if lost:
+            lost_timer += 1
+            if lost_timer > FPS*5:# 5 seconds
+                lost_timer=0
+                lost = False
+                break
+            else:
+                continue
+
         
         #wait for tick
         clock.tick(FPS)
@@ -161,20 +207,18 @@ def main():
         if len(enemies) == 0:
             level += 1
             wave_length += 5
-            for x in range(wave_length):
-                enemies.append(Enemy(random.randrange(50, WIDTH-50), random.randrange(-1500, -50), random.choice("RED", "BLUE", "GREEN")))
+            for i in range(wave_length):
+                enemies.append(Enemy(random.randrange(50, WIDTH-50), random.randrange(-1500, -50), random.choice(("RED", "BLUE", "GREEN"))))
 
-        #draw window
-        redraw_window()
+        #Move enemy ships
+        for enemy in enemies:
+            enemy.move(enemy_velocity)
+            if enemy.y +enemy.get_height() > HEIGHT:
+                lives -= 1
+                enemies.remove(enemy)
 
-        #Check for user inputs
-        for event in pygame.event.get():
-
-            #Check for QUIT
-            if event.type == pygame.QUIT:
-                run = False
-
-        # Check key presses and perform actions    
+        # Move player ship 
+        # Check key presses and move    
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             player_ship.move(player_velocity, 0)
@@ -185,5 +229,13 @@ def main():
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
            	player_ship.move(0, player_velocity)
 
+        # Check for losing condition
+        if lives <= 0 or player_ship.health <= 0:
+            lost = True
+        # Check for user inputs(Check for QUIT)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
 
+#start game       
 main()
