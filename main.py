@@ -68,6 +68,9 @@ class Laser:
 
 #Define ships
 class Ship:
+    #Class constants
+    COOLDOWN = 50
+
     def __init__(self, x, y, health=100):
         self.x, self.y = x,y
         self.health = health
@@ -77,8 +80,20 @@ class Ship:
         self.cool_down_counter = 0
         
     def draw(self, window): #draw the ship on specified surface
-        window.blit(self.ship_img, (self.x, self.y))        
-        
+        window.blit(self.ship_img, (self.x, self.y))
+        for laser in self.lasers:
+            laser.draw(window)
+
+    def move_lasers(self, vel, obj):
+        self.cooldown()
+        for laser in self.lasers:
+            laser.move(vel)
+            if laser.off_screen():
+                self.lasers.remove(laser)
+            elif laser.collision(obj):
+                obj.health -= 10
+                self.lasers.remove(laser)
+
     def move(self, x, y):  #move the ship relative to current position +/- x,y and prevent from going off screen
         if (self.x + x > 0) and (self.x + x + self.ship_img.get_width() < WIDTH):
             self.x += x
@@ -95,7 +110,18 @@ class Ship:
 
     # Shoot the laser    
     def shoot(self):  #shoot stuff
-        self.laser_img = self.laser_img
+        if self.cool_down_counter == 0:
+            laser = Laser(self.x, self.y, self.laser_img)
+            self.lasers.append(laser)
+            self.cool_down_counter = 1
+    
+    # Cooldown timer
+    def cooldown(self):
+        if self.cool_down_counter > self.COOLDOWN:
+            self.cool_down_counter = 0
+        elif self.cool_down_counter > 0:
+            self.cool_down_counter +=1
+
     
     # Test is the ship is destoryed
     def isDestroyed(self):
@@ -116,6 +142,18 @@ class Player(Ship):
         self.mask = pygame.mask.from_surface(self.ship_img)
         self.max_health = health
 
+    def move_lasers(self, vel, objs):
+        self.cooldown()
+        for laser in self.lasers:
+            laser.move(vel)
+            if laser.off_screen():
+                self.lasers.remove(laser)
+            else:
+                for obj in objs:
+                    if laser.collision(obj):
+                        objs.remove(obj)
+                        self.lasers.remove(laser)
+
 class Enemy(Ship):
 
     #dictionary for colours of ships
@@ -134,10 +172,12 @@ class Enemy(Ship):
     def move(self, vel):
         self.y += vel
 
+                       
+
 def collide(obj1, obj2):
 	offset_x = obj2.x - obj1.x
 	offset_y = obj2.y - obj1.y
-	return obj1.mask.overlap(obj2.mask, (offset_x, offset_y))
+	return obj1.mask.overlap(obj2.mask, (offset_x, offset_y)) != None #returns a tuple with x, y location of overlap or None
     
 def main():
     
@@ -155,8 +195,9 @@ def main():
     player_velocity = velocity // FPS #adjust velocity for variable FPS
     
     enemies = [] #will hold enemies
-    enemy_velocity = 120 // FPS
+    enemy_velocity = 60 // FPS
     wave_length = 0 #number of enemies per level
+    laser_velocity = 120 // FPS
 
     
     # Create ship objects
@@ -209,18 +250,27 @@ def main():
         #wait for tick
         clock.tick(FPS)
 
-        if len(enemies) == 0:
+        # New level game variable update
+        if len(enemies) == 0:  
             level += 1
             wave_length += 5
+            enemy_velocity += level // 2
+            laser_velocity += level // 2
             for i in range(wave_length):
                 enemies.append(Enemy(random.randrange(50, WIDTH-50), random.randrange(-1500, -50), random.choice(("RED", "BLUE", "GREEN"))))
 
         #Move enemy ships
         for enemy in enemies:
             enemy.move(enemy_velocity)
-            if enemy.y +enemy.get_height() > HEIGHT:
+            enemy.move_lasers(laser_velocity, player_ship)   # move and check for collision
+            if collide(enemy, player_ship):          # Check for ship to ship collision
+                enemies.remove(enemy)
+                player_ship.health -= 20
+            if enemy.y +enemy.get_height() > HEIGHT:         # Check for enemy making it to bottom of sceen
                 lives -= 1
                 enemies.remove(enemy)
+            if random.randrange(1,10000)* 0.1 / FPS > 100:
+                enemy.shoot()
 
         # Move player ship 
         # Check key presses and move    
@@ -233,6 +283,8 @@ def main():
             player_ship.move(0, -player_velocity)
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
            	player_ship.move(0, player_velocity)
+        if keys[pygame.K_SPACE]:
+            player_ship.shoot()
 
         # Check for losing condition
         if lives <= 0 or player_ship.health <= 0:
@@ -242,5 +294,7 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
+        # Move Player lasers after moving ship and check if we hit an enemy
+        player_ship.move_lasers(-laser_velocity, enemies)
 #start game       
 main()
