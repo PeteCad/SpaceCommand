@@ -49,7 +49,7 @@ lost_font = pygame.font.SysFont("comicsans", FONT_SIZE+10)
 #Define lasers
 class Laser:
     def __init__(self, x, y, img):
-        self.x = x
+        self.x = x 
         self.y = y
         self.img = img
         self.mask = pygame.mask.from_surface(self.img)
@@ -132,6 +132,9 @@ class Ship:
     
     def get_height(self):
             return self.ship_img.get_height()
+
+    def off_screen(self):
+        return self.y < 0 or self.y > HEIGHT
 
 class Player(Ship):
 
@@ -269,7 +272,7 @@ def main():
             if enemy.y +enemy.get_height() > HEIGHT:         # Check for enemy making it to bottom of sceen
                 lives -= 1
                 enemies.remove(enemy)
-            if random.randrange(1,10000)* 0.1 / FPS < 0.1:
+            if random.randrange(0,4*FPS) == 1 and enemy.off_screen() == False:
                 enemy.shoot()
 
         # Move player ship 
