@@ -269,7 +269,7 @@ def main():
             if enemy.y +enemy.get_height() > HEIGHT:         # Check for enemy making it to bottom of sceen
                 lives -= 1
                 enemies.remove(enemy)
-            if random.randrange(1,10000)* 0.1 / FPS > 100:
+            if random.randrange(1,10000)* 0.1 / FPS < 0.1:
                 enemy.shoot()
 
         # Move player ship 
