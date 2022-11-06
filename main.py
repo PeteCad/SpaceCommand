@@ -61,7 +61,7 @@ class Laser:
         self.y += y
 
     def off_screen(self):
-        return self.y < 0 and self.y > HEIGHT
+        return self.y < 0 or self.y > HEIGHT
     
     def collision(self, obj):
         return collide(self, obj)
@@ -272,7 +272,7 @@ def main():
             if enemy.y +enemy.get_height() > HEIGHT:         # Check for enemy making it to bottom of sceen
                 lives -= 1
                 enemies.remove(enemy)
-            if random.randrange(0,4*FPS) == 1 and enemy.off_screen() == False:
+            if random.randrange(0,4*FPS) == 1:
                 offset = -50 + (enemy.get_width()/2)
                 enemy.shoot(offset)
 
@@ -286,11 +286,11 @@ def main():
         if keys[pygame.K_UP] or keys[pygame.K_w]:
             player_ship.move(0, -player_velocity)
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-           	player_ship.move(0, player_velocity)
+            player_ship.move(0, player_velocity)
         if keys[pygame.K_SPACE]:
             player_ship.shoot()
 
-        # Check for losing condition
+         # Check for losing condition
         if lives <= 0 or player_ship.health <= 0:
             lost = True
         # Check for user inputs(Check for QUIT)
