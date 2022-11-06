@@ -35,6 +35,8 @@ BG = pygame.transform.scale(BG, WXH)
 #colour constants
 WHITE = (255,255,255)
 RED = (255,0,0)
+GREEN = (0,255,0)
+BLUE = (0,0,255)
 
 # Set up fonts
 # font colour and attributes
@@ -97,7 +99,7 @@ class Ship:
     def move(self, x, y):  #move the ship relative to current position +/- x,y and prevent from going off screen
         if (self.x + x > 0) and (self.x + x + self.ship_img.get_width() < WIDTH):
             self.x += x
-        if (self.y + y > 0) and (self.y + y + self.ship_img.get_height() < HEIGHT):
+        if (self.y + y > 0) and (self.y + y + self.ship_img.get_height() +10 < HEIGHT):     # leaves room under the ship for healthbar
             self.y += y
         
     def position(self, x, y): #set the current position of the ship
@@ -156,6 +158,14 @@ class Player(Ship):
                     if laser.collision(obj):
                         objs.remove(obj)
                         self.lasers.remove(laser)
+
+    def healthbar(self, window):
+        pygame.draw.rect(window, RED, (self.x, self.y+self.ship_img.get_height()+5, self.ship_img.get_width(), 5))                             # put healthbar 10 below player ship
+        pygame.draw.rect(window, GREEN, (self.x, self.y+self.ship_img.get_height()+5, self.ship_img.get_width()* self.health / self.max_health, 5))  # Cover red with % health in green
+
+    def draw(self, window):
+        super().draw(window)
+        self.healthbar(window)
 
 class Enemy(Ship):
 
@@ -265,16 +275,20 @@ def main():
         #Move enemy ships
         for enemy in enemies:
             enemy.move(enemy_velocity)
-            enemy.move_lasers(laser_velocity, player_ship)   # move and check for collision
-            if collide(enemy, player_ship):          # Check for ship to ship collision
-                enemies.remove(enemy)
-                player_ship.health -= 20
-            if enemy.y +enemy.get_height() > HEIGHT:         # Check for enemy making it to bottom of sceen
-                lives -= 1
-                enemies.remove(enemy)
-            if random.randrange(0,4*FPS) == 1:
+            enemy.move_lasers(laser_velocity, player_ship)  # move and check for collision
+
+            if random.randrange(0,4*FPS) == 1:              # Try to shoot.
                 offset = -50 + (enemy.get_width()/2)
                 enemy.shoot(offset)
+
+            if collide(enemy, player_ship):                 # Check for ship to ship collision
+                enemies.remove(enemy)
+                player_ship.health -= 20
+            elif enemy.y +enemy.get_height() > HEIGHT:        # Check for enemy making it to bottom of sceen
+                lives -= 1
+                enemies.remove(enemy)
+
+
 
         # Move player ship 
         # Check key presses and move    
