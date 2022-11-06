@@ -109,9 +109,9 @@ class Ship:
         self.laser_img = laser_img
 
     # Shoot the laser    
-    def shoot(self):  #shoot stuff
+    def shoot(self, offset=0):  #shoot stuff
         if self.cool_down_counter == 0:
-            laser = Laser(self.x, self.y, self.laser_img)
+            laser = Laser(self.x + offset, self.y, self.laser_img)
             self.lasers.append(laser)
             self.cool_down_counter = 1
     
@@ -273,7 +273,8 @@ def main():
                 lives -= 1
                 enemies.remove(enemy)
             if random.randrange(0,4*FPS) == 1 and enemy.off_screen() == False:
-                enemy.shoot()
+                offset = -50 + (enemy.get_width()/2)
+                enemy.shoot(offset)
 
         # Move player ship 
         # Check key presses and move    
