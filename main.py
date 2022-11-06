@@ -46,6 +46,9 @@ FONT_SIZE = 50
 main_font = pygame.font.SysFont("comicsans", FONT_SIZE)
 lost_font = pygame.font.SysFont("comicsans", FONT_SIZE+10)
 
+# Global Game Constants
+FPS = 60 #Frames per second
+
 
 # Define movable objects
 #Define lasers
@@ -68,21 +71,26 @@ class Laser:
     def collision(self, obj):
         return collide(self, obj)
 
-#Define ships
+# Define Classes here
+# Define class for Ship
 class Ship:
     #Class constants
-    COOLDOWN = 50
+    COOLDOWN = round(0.5 * FPS)                                 # Allow laser to fire every two 10th of a second, round for int
 
-    def __init__(self, x, y, health=100):
+    def __init__(self, x, y, health=100, isHealthbar=False):
         self.x, self.y = x,y
-        self.health = health
+        self.max_health = self.health = health
         self.ship_img = None
         self.laser_img = None
         self.lasers = []
         self.cool_down_counter = 0
+        self.isHealthbar = isHealthbar
         
     def draw(self, window): #draw the ship on specified surface
         window.blit(self.ship_img, (self.x, self.y))
+        if self.isHealthbar:
+            self.healthbar(window)
+
         for laser in self.lasers:
             laser.draw(window)
 
@@ -124,6 +132,10 @@ class Ship:
         elif self.cool_down_counter > 0:
             self.cool_down_counter +=1
 
+    # Draw the health bar
+    def healthbar(self, window):
+        pygame.draw.rect(window, RED, (self.x, self.y+self.ship_img.get_height()+5, self.ship_img.get_width(), 5))                             # put healthbar 10 below player ship
+        pygame.draw.rect(window, GREEN, (self.x, self.y+self.ship_img.get_height()+5, self.ship_img.get_width()* self.health / self.max_health, 5))  # Cover red with % health in green
     
     # Test is the ship is destoryed
     def isDestroyed(self):
@@ -138,15 +150,16 @@ class Ship:
     def off_screen(self):
         return self.y < 0 or self.y > HEIGHT
 
+#Define a class for a Player ship inhereted from Ship
 class Player(Ship):
 
     def __init__(self, x, y, health=100):
-        super().__init__(x, y, health)
+        super().__init__(x, y, health, True)
         self.ship_img = YELLOW_SPACE_SHIP
         self.laser_img = YELLOW_LASER
         self.mask = pygame.mask.from_surface(self.ship_img)
-        self.max_health = health
 
+    # Move laser then check if the player laser impacted and enemy
     def move_lasers(self, vel, objs):
         self.cooldown()
         for laser in self.lasers:
@@ -159,14 +172,7 @@ class Player(Ship):
                         objs.remove(obj)
                         self.lasers.remove(laser)
 
-    def healthbar(self, window):
-        pygame.draw.rect(window, RED, (self.x, self.y+self.ship_img.get_height()+5, self.ship_img.get_width(), 5))                             # put healthbar 10 below player ship
-        pygame.draw.rect(window, GREEN, (self.x, self.y+self.ship_img.get_height()+5, self.ship_img.get_width()* self.health / self.max_health, 5))  # Cover red with % health in green
-
-    def draw(self, window):
-        super().draw(window)
-        self.healthbar(window)
-
+# Define a clas for the Enemy ship and inherit Ship       
 class Enemy(Ship):
 
     #dictionary for colours of ships
@@ -183,9 +189,9 @@ class Enemy(Ship):
         self.mask = pygame.mask.from_surface(self.ship_img)
 
     def move(self, vel):
-        self.y += vel
+        self.y += vel    #Enemy ships only move down
 
-                       
+#Define Functions here                      
 
 def collide(obj1, obj2):
 	offset_x = obj2.x - obj1.x
@@ -196,7 +202,6 @@ def main():
     
     # Collision checking setup
     run = True
-    FPS = 60 #Frames per second
     clock = pygame.time.Clock()
 
     # Game Play Variables
@@ -215,8 +220,7 @@ def main():
     
     # Create ship objects
     player_ship = Player(300, 600)
-    
-
+    player_ship.position(WIDTH / 2 - player_ship.get_width()/2, HEIGHT - player_ship.get_height() - 10)  # Position the ship bottom centre, leaving room for healthbar
 
     def redraw_window():
 
@@ -267,8 +271,9 @@ def main():
         if len(enemies) == 0:  
             level += 1
             wave_length += 5
-            enemy_velocity += level // 2
-            laser_velocity += level // 2
+            if level % 5 == 0:
+                enemy_velocity +=  level % 5
+                laser_velocity +=  level % 5
             for i in range(wave_length):
                 enemies.append(Enemy(random.randrange(50, WIDTH-50), random.randrange(-1500, -50), random.choice(("RED", "BLUE", "GREEN"))))
 
